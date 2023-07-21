@@ -41,3 +41,16 @@ password : ldapAdmin
 5. Pour chaque instance keycloak, importer le fichier `./src/docker/{instance name}/realm-export.json`
 6. Pour chaque instance keycloak, créer au moins un utilisateur
 7. démarrer l'application cliente, depuis le dossier `src/our-application-to-be-protected` via la commande `mvn spring-boot:run`
+8. Ouvrir l'application dans le navigateur Internet : `http://localhost:8080`
+
+ ![Page d'accueil de l'application](/docs/ressources/home.png)
+
+ Le clic sur les liens [Secured Area] ou [Connexion] renvoie l'utilisateur sur la page de connexion :
+
+ ![Page de connexion](/docs/ressources/login.png)
+
+ L'utilisateur peut se connecter directement à partie de :
+ - l'instance keycloak propre à l'application, ou
+ - l'annuaire externe (fédération des identités), ou faire le choix de se connecter via un partenaire :
+     - Partenaire OIDC pour une connexion selon le protocole OpenID Connect
+     - Partenaire SAML pour une connexion selon le protocle SAML v2
