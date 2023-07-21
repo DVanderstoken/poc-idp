@@ -49,7 +49,7 @@ password : ldapAdmin
 
  ![Page de connexion](/docs/ressources/login.png)
 
- L'utilisateur peut se connecter directement à partie de :
+ L'utilisateur peut se connecter directement à partir de :
  - l'instance keycloak propre à l'application, ou
  - l'annuaire externe (fédération des identités), ou faire le choix de se connecter via un partenaire :
      - Partenaire OIDC pour une connexion selon le protocole OpenID Connect
