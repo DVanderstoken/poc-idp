@@ -64,7 +64,7 @@ launch() {
   $1 $2
 }
 
-args=$(getopt -a -o sxr --long start,stop,restart -- "$@")
+args=$(getopt -a -o dsxr --long delete,start,stop,restart -- "$@")
 if [[ $? -gt 0 ]]; then
   usage
 fi

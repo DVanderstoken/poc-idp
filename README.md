@@ -23,11 +23,9 @@ Le POC repose sur la mise en oeuvre de l'outil Keycloak qui fournit nativement c
 
 ### Vision Réseau (mise en oeuvre Docker)
 
-L'utilisation du projet nécessite la création d'un réseau Docker : 
-
-```
-docker network create --driver=bridge --subnet=172.31.0.0/16 idp-network
-```
-
 ![Vision Réseau sous Docker](/docs/ressources/vision-reseau-docker.png)
 
+
+## Utilisation
+
+1. Créer un réseau dans Docker : `docker network create --drive=bridge --subnet=172.31.0.0/16 idp-network`
