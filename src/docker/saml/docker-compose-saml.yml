@@ -1,0 +1,53 @@
+version: '3'
+services:
+  postgresql2:
+    image: docker.io/bitnami/postgresql:11
+    container_name: postgresql2
+    hostname: postgresql2
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=kc-saml
+      - POSTGRESQL_DATABASE=saml
+    volumes:
+      - 'postgresql2_data:/bitnami/postgresql'
+    ports:
+      - "5433:5432"
+    expose:
+      - "5432"
+    networks:
+      - saml-idp-network
+      
+  keycloak-saml:
+    container_name: kc-saml
+    hostname: saml.auth.kc
+    image: docker.io/bitnami/keycloak:21
+    environment:
+      - KEYCLOAK_HTTP_PORT=30200
+      - KEYCLOAK_HTTPS_PORT=30203
+      - KEYCLOAK_DATABASE_HOST=postgresql2
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_NAME=saml
+      - KEYCLOAK_DATABASE_USER=kc-saml
+      - KEYCLOAK_ADMIN_USER=admin
+      - KEYCLOAK_ADMIN_PASSWORD=keycloakAdmin
+    depends_on:
+      - postgresql2
+    ports:
+      - "30200:30200"
+    networks:
+      saml-idp-network:
+      idp-network:
+        ipv4_address: 172.31.0.5
+    extra_hosts:
+      ours.auth.kc: 172.31.0.3
+      saml.auth.kc: 172.31.0.5
+
+volumes:
+  postgresql2_data:
+
+
+networks:
+  saml-idp-network:
+  idp-network:
+    external: true

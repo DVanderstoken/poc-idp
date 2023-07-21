@@ -1,0 +1,52 @@
+version: '3'
+services:
+  postgresql4ours:
+    image: docker.io/bitnami/postgresql:11
+    container_name: postgresql4ours
+    hostname: postgresql4ours
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_USERNAME=kc-ours
+      - POSTGRESQL_DATABASE=ours
+    volumes:
+      - 'postgresql4ours_data:/bitnami/postgresql'
+    ports:
+      - "5434:5432"
+    expose:
+      - "5432"
+    networks:
+      - ours-idp-network
+
+  keycloak-ours:
+    container_name: kc-ours
+    hostname: ours.auth.kc
+    image: docker.io/bitnami/keycloak:21
+    environment:
+      - KEYCLOAK_HTTP_PORT=30300
+      - KEYCLOAK_HTTPS_PORT=30303
+      - KEYCLOAK_DATABASE_HOST=postgresql4ours
+      - KEYCLOAK_DATABASE_PORT=5432
+      - KEYCLOAK_DATABASE_NAME=ours
+      - KEYCLOAK_DATABASE_USER=kc-ours
+      - KEYCLOAK_ADMIN_USER=admin
+      - KEYCLOAK_ADMIN_PASSWORD=keycloakAdmin
+    depends_on:
+      - postgresql4ours
+    ports:
+      - "30300:30300"
+    networks:
+      ours-idp-network:
+      idp-network:
+        ipv4_address: 172.31.0.3
+    extra_hosts:
+      oidc.auth.kc: 172.31.0.4
+      saml.auth.kc: 172.31.0.5
+
+volumes:
+  postgresql4ours_data:
+
+networks:
+  ours-idp-network:
+  idp-network:
+    external: true

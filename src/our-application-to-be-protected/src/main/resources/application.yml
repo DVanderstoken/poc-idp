@@ -1,0 +1,24 @@
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        security: TRACE
+      
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: our-application
+            client-secret: BLAZrlUMeJjeW9q0zVEer2UVPWJOO2DT
+            scope:
+            - openid
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/our-application
+        provider: 
+          keycloak:
+            issuer-uri: http://ours.auth.kc:30300/realms/OurApplicationRealm
+            user-name-attribute: preferred_username
+           

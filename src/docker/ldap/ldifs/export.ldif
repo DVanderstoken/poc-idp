@@ -1,0 +1,73 @@
+version: 1
+
+dn: dc=autorite,dc=gouv,dc=fr
+objectClass: dcObject
+objectClass: organization
+dc: autorite
+o: autorite
+
+dn: ou=people,dc=autorite,dc=gouv,dc=fr
+objectClass: organizationalUnit
+ou: people
+
+dn: cn=alba.martin,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: alba.martin
+sn: Martin
+ou: people
+userPassword: password
+
+dn: cn=lucas.bernard,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: lucas.bernard
+sn: Bernard
+ou: people
+userPassword: password
+
+dn: cn=mia.dubois,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: mia.dubois
+sn: Dubois
+ou: people
+userPassword: password
+
+dn: cn=ambre.thomas,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: ambre.thomas
+sn: Thomas
+ou: people
+userPassword: password
+
+dn: cn=leo.robert,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: leo.robert
+sn: Robert
+ou: people
+userPassword: password
+
+dn: cn=louise.richard,ou=people,dc=autorite,dc=gouv,dc=fr
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+cn: louise.richard
+sn: Richard
+ou: people
+userPassword: password
+
+dn: cn=eapostilles,ou=people,dc=autorite,dc=gouv,dc=fr
+objectClass: groupOfNames
+cn: eapostilles
+member: cn=alba.martin,ou=people,dc=autorite,dc=gouv,dc=fr
+member: cn=lucas.bernard,ou=people,dc=autorite,dc=gouv,dc=fr
+member: cn=mia.dubois,ou=people,dc=autorite,dc=gouv,dc=fr
+member: cn=ambre.thomas,ou=people,dc=autorite,dc=gouv,dc=fr
