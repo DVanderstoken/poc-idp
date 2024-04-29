@@ -89,6 +89,13 @@ if [[ $# -eq 0 ]]; then
   usage
 fi
 
+if [ ! "$(docker network ls | grep idp-network)" ]; then
+  echo -e "${IBlue}------------------------------------------${Color_Off}"
+  echo -e "${IBlue}Creating Docker Network ${Color_Off}"
+  echo -e "${IBlue}------------------------------------------${Color_Off}"
+  docker network create --driver=bridge --subnet=172.31.0.0/16 idp-network
+fi
+
 parameter=$@
 
 if [[ "all" == ${parameter} ]]; 

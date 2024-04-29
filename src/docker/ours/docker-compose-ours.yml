@@ -12,9 +12,9 @@ services:
     volumes:
       - 'postgresql4ours_data:/bitnami/postgresql'
     ports:
-      - "5434:5432"
+      - 5434:5432
     expose:
-      - "5432"
+      - 5432
     networks:
       - ours-idp-network
 
@@ -32,10 +32,15 @@ services:
       - KEYCLOAK_ADMIN_USER=admin
       - KEYCLOAK_ADMIN_PASSWORD=keycloakAdmin
       - KEYCLOAK_ENABLE_HEALTH_ENDPOINTS=true
+      - KEYCLOAK_ENABLE_HTTPS=true
+      - KEYCLOAK_HTTPS_USE_PEM=true
+      - KEYCLOAK_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt.pem
+      - KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key.pem
     depends_on:
       - postgresql4ours
     ports:
       - "30300:30300"
+      - "30303:30303"
     networks:
       ours-idp-network:
       idp-network:
@@ -43,6 +48,11 @@ services:
     extra_hosts:
       oidc.auth.kc: 172.31.0.4
       saml.auth.kc: 172.31.0.5
+    volumes:
+      - './theme/notaires:/opt/bitnami/keycloak/themes/notaires'
+      - './theme/ours:/opt/bitnami/keycloak/themes/ours'
+      - './certificates/server.crt.pem:/opt/keycloak/conf/server.crt.pem'
+      - './certificates/server.key.pem:/opt/keycloak/conf/server.key.pem'
 
 volumes:
   postgresql4ours_data:

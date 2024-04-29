@@ -12,9 +12,9 @@ services:
     volumes:
       - 'postgresql2_data:/bitnami/postgresql'
     ports:
-      - "5433:5432"
+      - 5433:5432
     expose:
-      - "5432"
+      - 5432
     networks:
       - saml-idp-network
       
@@ -31,10 +31,16 @@ services:
       - KEYCLOAK_DATABASE_USER=kc-saml
       - KEYCLOAK_ADMIN_USER=admin
       - KEYCLOAK_ADMIN_PASSWORD=keycloakAdmin
+#      - KEYCLOAK_ENABLE_HTTPS=true
+#      - KEYCLOAK_HTTPS_USE_PEM=true
+#      - KEYCLOAK_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt.pem
+#      - KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key.pem
+      - KEYCLOAK_EXTRA_ARGS_PREPENDED=--verbose
     depends_on:
       - postgresql2
     ports:
       - "30200:30200"
+#      - "30203:30203"
     networks:
       saml-idp-network:
       idp-network:
@@ -42,6 +48,10 @@ services:
     extra_hosts:
       ours.auth.kc: 172.31.0.3
       saml.auth.kc: 172.31.0.5
+    volumes:
+      - './theme/saml-theme:/opt/bitnami/keycloak/themes/saml-theme'
+#      - './certificates/server.crt.pem:/opt/keycloak/conf/server.crt.pem'
+#      - './certificates/server.key.pem:/opt/keycloak/conf/server.key.pem'
 
 volumes:
   postgresql2_data:

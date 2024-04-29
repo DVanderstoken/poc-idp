@@ -2,17 +2,20 @@ logging:
   level:
     root: INFO
     org:
-      springframework:
-        security: TRACE
+      springframework: DEBUG
       
 spring:
   security:
     oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://ours.auth.kc:30300/realms/OurApplicationRealm
+          jwk-set-uri: http://ours.auth.kc:30300/realms/OurApplicationRealm/protocol/openid-connect/certs
       client:
         registration:
           keycloak:
             client-id: our-application
-            client-secret: qKZ0rDzNdklKMD6YNectpOaEy5FkGbQe
+            client-secret: XvTYsDYHY4SoQxHZpG6aY97gOcG48XKq
             scope:
             - openid
             authorization-grant-type: authorization_code
@@ -20,6 +23,22 @@ spring:
         provider: 
           keycloak:
             issuer-uri: http://ours.auth.kc:30300/realms/OurApplicationRealm
-            user-name-attribute: preferred_username
+            user-name-attribute: preferred_username 
+  ssl:
+    bundle:
+      jks:
+        server:
+          key:
+            alias: "ours.auth.kc"
+          keystore:
+            location: "classpath:ssl/keystore.jks"
+            password: changeit
+            type: "JKS"                     
  
-           
+  main:
+    allow-bean-definition-overriding: true      
+        
+server:
+  error:
+    whitelabel:
+      enabled: false

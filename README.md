@@ -62,3 +62,33 @@ password : ldapAdmin
  - Royaume et client interne propres à l'identification des notaires,
  - Partenaire OIDC pour une connexion selon le protocole OpenID Connect, ou
  - Partenaire SAML pour une connexion selon le protocle SAML v2
+
+## TLS
+1. créer le certificat (auto-signé !) dans le répertoire de votre choix :
+```
+openssl req -newkey rsa:2048 -nodes -keyout server.key.pem -x509 -days 3650 -out server.crt.pem
+```
+2. Dans le fichier docker-compose :
+```
+    volumes:
+      (...)
+      - './certificates/server.crt.pem:/opt/keycloak/conf/server.crt.pem'
+      - './certificates/server.key.pem:/opt/keycloak/conf/server.key.pem'
+   
+   (...)
+
+    ports:
+      (...)
+      - "30203:30203"
+
+   (...)
+   
+    environment:
+      (...)
+      - KEYCLOAK_HTTPS_PORT=30203
+      - KEYCLOAK_ENABLE_HTTPS=true
+      - KEYCLOAK_HTTPS_USE_PEM=true
+      - KEYCLOAK_HTTPS_CERTIFICATE_FILE=/opt/keycloak/conf/server.crt.pem
+      - KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE=/opt/keycloak/conf/server.key.pem
+```
+      

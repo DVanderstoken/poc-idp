@@ -1,8 +1,8 @@
 version: '3'
 services:
-  postgresql:
+  postgresql4oidc:
     image: docker.io/bitnami/postgresql:11
-    container_name: postgresql
+    container_name: postgresql4oidc
     hostname: postgresql
     environment:
       # ALLOW_EMPTY_PASSWORD is recommended only for development.
@@ -13,6 +13,8 @@ services:
       - 'postgresql_data:/bitnami/postgresql'
     ports:
       - "5432:5432"
+    expose:
+      - "5432"
     networks:
       - oidc-idp-network
 
@@ -23,12 +25,14 @@ services:
     environment:
       - KEYCLOAK_HTTP_PORT=30100
       - KEYCLOAK_HTTPS_PORT=30103
+      - KEYCLOAK_DATABASE_HOST=postgresql4oidc
+      - KEYCLOAK_DATABASE_PORT=5432
       - KEYCLOAK_DATABASE_NAME=oidc
       - KEYCLOAK_DATABASE_USER=kc-oidc
       - KEYCLOAK_ADMIN_USER=admin
       - KEYCLOAK_ADMIN_PASSWORD=keycloakAdmin
     depends_on:
-      - postgresql
+      - postgresql4oidc
     ports:
       - "30100:30100"
     networks:
@@ -38,6 +42,8 @@ services:
     extra_hosts:
       ours.auth.kc: 172.31.0.3
       oidc.auth.kc: 172.31.0.4
+    volumes:
+      - './theme/oidc-theme:/opt/bitnami/keycloak/themes/oidc-theme'
 
 volumes:
   postgresql_data:

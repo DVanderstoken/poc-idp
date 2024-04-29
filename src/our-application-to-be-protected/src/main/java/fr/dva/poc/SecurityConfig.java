@@ -2,52 +2,70 @@ package fr.dva.poc;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import org.springframework.web.server.WebSession;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
+@EnableReactiveMethodSecurity(useAuthorizationManager = true)
 public class SecurityConfig {
 
-	@Autowired
-	ClientRegistrationRepository clientRegistrationRepository;
+  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+  private String jwkSetURI;
 
-	@Bean
-	public SecurityFilterChain ourAppSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+  /**
+   * Rôle Responsable fonctionnel
+   */
+  public static final String REALM_ROLE_RESPONSABLE_FONCTIONEL = "role_responsable_fonctionnel";
 
-		LogoutSuccessHandler logoutHandler = new OidcClientInitiatedLogoutSuccessHandler(
-				this.clientRegistrationRepository);
+  private final ReactiveClientRegistrationRepository clientRegistrationRepository;
 
-		// @formatter:off
+  public SecurityConfig(ReactiveClientRegistrationRepository clientRegistrationRepository) {
+    this.clientRegistrationRepository = clientRegistrationRepository;
+  }
+
+  @Bean
+  SecurityWebFilterChain ourAppSecurityFilterChain(ServerHttpSecurity httpSecurity) throws Exception {
+
+    // @formatter:off
 		httpSecurity
-		.authorizeHttpRequests(auth -> auth.requestMatchers("/public").permitAll()
-				                           .requestMatchers("/").permitAll()
-				                           .requestMatchers("/error").permitAll()
-				                           .anyRequest().authenticated())
-		                                   .anonymous(ano -> ano.disable())
-		                                   .oauth2Login(withDefaults())
-		                                   .logout(logout -> logout.logoutUrl("/logout")
-		                                		                   .logoutSuccessHandler(oidcLogoutSuccessHandler())
-		                                		                   .invalidateHttpSession(true)
-		                                		                   .clearAuthentication(true)
-		                                		                   .deleteCookies("JSESSIONID"));
+		.authorizeExchange(auth -> auth. pathMatchers("/public").permitAll()
+				                           .pathMatchers("/").permitAll()
+				                           .pathMatchers("/error").permitAll()
+                                           .pathMatchers("/static/**").permitAll()
+				                           .anyExchange().authenticated())
+		.anonymous(anonymous -> anonymous.disable())
+		.oauth2Login(withDefaults())
+		.oauth2Client(Customizer.withDefaults())
+		.logout(logout -> logout.logoutUrl("/logout")
+		    	                .logoutSuccessHandler(oidcLogoutSuccessHandler()))
+        .exceptionHandling(exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()))
+        .oauth2ResourceServer((resourceServer) -> resourceServer.jwt(withDefaults()));
+		
 		// @formatter:on
 
-		return httpSecurity.build();
-	}
+    return httpSecurity.build();
+  }
 
-	private OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
-		final OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
-				this.clientRegistrationRepository);
-		oidcLogoutSuccessHandler.setPostLogoutRedirectUri("http://localhost:8080/");
-		return oidcLogoutSuccessHandler;
-	}
+  private ServerLogoutSuccessHandler oidcLogoutSuccessHandler() {
+    final OidcClientInitiatedServerLogoutSuccessHandler oidcClientInitiatedServerLogoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(
+        clientRegistrationRepository);
+    return (exchange, authentication) -> {
+      exchange.getExchange().getSession().flatMap(WebSession::invalidate);
+      authentication.setAuthenticated(false);
+      oidcClientInitiatedServerLogoutSuccessHandler.setPostLogoutRedirectUri("http://localhost:8080/");
+      return oidcClientInitiatedServerLogoutSuccessHandler.onLogoutSuccess(exchange, authentication);
+    };
+  }
 
 }
